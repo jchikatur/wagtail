@@ -1,0 +1,37 @@
+version: '2.2'
+
+services:
+    db:
+       image: "postgres:10.11-alpine"
+       environment:
+           - 'POSTGRES_PASSWORD=q1'
+       mem_limit: 150m
+       restart: on-failure
+       ports:
+           - "6002:5432"
+       container_name: postgresdb
+       volumes:
+               - "/data/disk1/databases/pgdata:/var/lib/postgresql/10.11/main:rw"
+       networks:
+           - blognet
+    server:
+        image: "wagtail:1.0"
+        environment:
+            - "POSTGREDB_NAME=postgres"
+            - "POSTGRES_DB_USER=postgres"
+            - "POSTGRES_DB_PASSWORD=q1"
+            - "POSTGRESDB_PORT_5432_TCP_ADDR=db"
+            - "POSTGRESDB_PORT_5432_TCP_PORT=5432"
+        cpu_count: 1
+        mem_limit: 512m
+        ports:
+            - "9000:8000"
+        container_name: blog
+        links:
+            - db
+        networks:
+            - blognet
+
+networks:
+    blognet:
+
